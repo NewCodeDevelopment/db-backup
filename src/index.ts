@@ -20,4 +20,4 @@ if(env.RUN_ON_STARTUP) {
 }
 job.start();
 
-console.log("Backup cron scheduled...")
+console.log(`Backup cron scheduled for: ${env.BACKUP_CRON_SCHEDULE}`)
