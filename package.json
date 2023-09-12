@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "dev": "tsc --watch"
   },
   "author": "Faraz Patankar",
   "license": "MIT",
