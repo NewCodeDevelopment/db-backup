@@ -1,24 +1,24 @@
-FROM alpine:3.14 AS build
+FROM node:18-bookworm AS builder
 
-WORKDIR /root
-
-RUN apk add --update --no-cache nodejs npm
+WORKDIR /app
 
 COPY package*.json ./
-COPY tsconfig.json ./
-COPY src ./src
 
 RUN npm install
+
+COPY . .
+
 RUN npm run build
 RUN npm prune --production
 
-FROM alpine:3.14
 
-WORKDIR /root
+FROM node:18-bookworm
 
-COPY --from=build /root/node_modules ./node_modules
-COPY --from=build /root/dist ./dist
+WORKDIR /app
 
-RUN apk add --update --no-cache postgresql-client nodejs npm
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
 
-ENTRYPOINT ["node", "dist/index.js"]
+RUN apt-get update && apt-get install -y postgresql && rm -rf /var/lib/apt/lists/*
+
+CMD ["node", "dist/index.js"]
