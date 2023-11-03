@@ -1,26 +1,35 @@
-import { envsafe, str, bool } from "envsafe";
+import "dotenv/config";
+import { z } from "zod";
 
-export const env = envsafe({
-  AWS_ACCESS_KEY_ID: str(),
-  AWS_SECRET_ACCESS_KEY: str(),
-  AWS_S3_BUCKET: str(),
-  AWS_S3_REGION: str(),
-  BACKUP_DATABASE_URL: str({
-    desc: 'The connection string of the database to backup.'
-  }),
-  BACKUP_CRON_SCHEDULE: str({
-    desc: 'The cron schedule to run the backup on.',
-    default: '0 5 * * *',
-    allowEmpty: true
-  }),
-  AWS_S3_ENDPOINT: str({
-    desc: 'The S3 custom endpoint you want to use.',
-    default: '',
-    allowEmpty: true,
-  }),
-  RUN_ON_STARTUP: bool({
-    desc: 'Run a backup on startup of this application',
-    default: false,
-    allowEmpty: true,
+export const env = z
+  .object({
+    AWS_ACCESS_KEY_ID: z.string({
+      invalid_type_error: "Invalid AWS access key",
+      required_error: "AWS access key is required",
+    }),
+    AWS_SECRET_ACCESS_KEY: z.string({
+      invalid_type_error: "Invalid AWS secret access key",
+      required_error: "AWS secret access key is required",
+    }),
+    AWS_S3_BUCKET: z.string({
+      invalid_type_error: "Invalid AWS bucket",
+      required_error: "AWS bucket is required",
+    }),
+    AWS_S3_REGION: z.string({
+      invalid_type_error: "Invalid AWS region",
+      required_error: "AWS region is required",
+    }),
+    BACKUP_DATABASE_URL: z.string({
+      invalid_type_error: "Invalid database URL",
+      required_error: "Database URL is required",
+    }),
+    BACKUP_CRON_SCHEDULE: z
+      .string({
+        invalid_type_error: "Invalid cron schedule",
+        required_error: "Cron schedule is required",
+      })
+      .optional()
+      .default("0 5 * * *"),
+    RUN_ON_STARTUP: z.coerce.boolean().optional().default(false),
   })
-})
+  .parse(process.env);
